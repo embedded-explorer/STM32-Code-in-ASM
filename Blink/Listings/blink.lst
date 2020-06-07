@@ -1,0 +1,199 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;=======================================================
+                       ========================
+    2 00000000         
+    3 00000000         ;Assembly Program to blink on board LED of NUCLEO-F401RE
+                       
+    4 00000000         
+    5 00000000         ;=======================================================
+                       ========================
+    6 00000000         
+    7 00000000 40023830 
+                       RCC_AHB1ENR
+                               EQU              0x40023830
+    8 00000000 40020000 
+                       GPIOA_MODER
+                               EQU              0x40020000
+    9 00000000 40020014 
+                       GPIOA_ODR
+                               EQU              0x40020014
+   10 00000000         
+   11 00000000                 AREA             |.text|, CODE, READONLY, ALIGN 
+= 2
+   12 00000000                 THUMB
+   13 00000000                 EXPORT           __main
+   14 00000000         
+   15 00000000         __main                               ; entry point of pr
+                                                            ogram
+   16 00000000 F000 F805       BL               GPIOA_Init  ; branch to GPIOA_I
+                                                            nit subroutine
+   17 00000004         LOOP
+   18 00000004 F000 F80E       BL               BLINK       ; branch to blink s
+                                                            ubroutine
+   19 00000008 F000 F812       BL               DELAY       ; branch to delay s
+                                                            ubroutine
+   20 0000000C E7FA            B                LOOP        ; stay in infinite 
+                                                            loop
+   21 0000000E         
+   22 0000000E         ;subroutine to configure PA5  
+   23 0000000E         GPIOA_Init
+   24 0000000E         ; Enable GPIOA Clock
+   25 0000000E 490D            LDR              R1, =RCC_AHB1ENR
+   26 00000010 6808            LDR              R0,[R1]     ; store current val
+                                                            ue of RCC_AHB1ENR i
+                                                            nto R0
+   27 00000012 F040 0001       ORR              R0, R0,#0x0001 ; enable clock f
+                                                            or GPIOA
+   28 00000016 6008            STR              R0,[R1]     ; sotore modified v
+                                                            alue back to RCC_AH
+                                                            B1ENR
+   29 00000018         
+   30 00000018         ; Set PA5 mode as output
+   31 00000018 490B            LDR              R1, =GPIOA_MODER
+   32 0000001A 6808            LDR              R0, [R1]
+   33 0000001C F440 6080       ORR              R0, R0, #0x0400
+   34 00000020 6008            STR              R0, [R1]
+   35 00000022 4770            BX               LR          ; return from subro
+                                                            utine
+   36 00000024         
+   37 00000024         ;blink subroutine
+   38 00000024         BLINK
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   39 00000024 4909            LDR              R1, =GPIOA_ODR
+   40 00000026 6808            LDR              R0,[R1]     ;store value of ODR
+                                                             into R0
+   41 00000028 F080 0020       EOR              R0, R0, #0x20 ;XOR R0 with 0x20
+                                                             inorder to blink
+   42 0000002C 6008            STR              R0, [R1]
+   43 0000002E 4770            BX               LR
+   44 00000030         
+   45 00000030         ;delay subroutine
+   46 00000030         DELAY
+   47 00000030         ; MOVW followed by MOVT is used to load 32 bit immediate
+                        value to register
+   48 00000030 F64F 50E8       MOVW             R0, #0xFDE8 ; MOVW loads lower 
+                                                            16 bits
+   49 00000034 F2C0 0010       MOVT             R0, #0x0010 ; MOVT loads heighe
+                                                            r 16 bits into R0
+   50 00000038 F1A0 0001 
+                       LOOP1   SUB              R0, R0, #1
+   51 0000003C 2800            CMP              R0, #0
+   52 0000003E D1FB            BNE              LOOP1
+   53 00000040 4770            BX               LR
+   54 00000042         
+   55 00000042 00 00           ALIGN
+   56 00000044                 END
+              40023830 
+              40020000 
+              40020014 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\objects\blink.d -o.\objects\blink.o -I.\RTE\_Target_1 -IC:\Ke
+il_ARM\ARM\CMSIS\5.7.0\CMSIS\Core\Include -IC:\Keil_ARM\Keil\STM32F4xx_DFP\2.14
+.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include --predefine="__EVAL SETA 1" --pred
+efine="__UVISION_VERSION SETA 527" --predefine="_RTE_ SETA 1" --predefine="STM3
+2F401xE SETA 1" --list=.\listings\blink.lst Blink.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 11 in file Blink.s
+   Uses
+      None
+Comment: .text unused
+BLINK 00000024
+
+Symbol: BLINK
+   Definitions
+      At line 38 in file Blink.s
+   Uses
+      At line 18 in file Blink.s
+Comment: BLINK used once
+DELAY 00000030
+
+Symbol: DELAY
+   Definitions
+      At line 46 in file Blink.s
+   Uses
+      At line 19 in file Blink.s
+Comment: DELAY used once
+GPIOA_Init 0000000E
+
+Symbol: GPIOA_Init
+   Definitions
+      At line 23 in file Blink.s
+   Uses
+      At line 16 in file Blink.s
+Comment: GPIOA_Init used once
+LOOP 00000004
+
+Symbol: LOOP
+   Definitions
+      At line 17 in file Blink.s
+   Uses
+      At line 20 in file Blink.s
+Comment: LOOP used once
+LOOP1 00000038
+
+Symbol: LOOP1
+   Definitions
+      At line 50 in file Blink.s
+   Uses
+      At line 52 in file Blink.s
+Comment: LOOP1 used once
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 15 in file Blink.s
+   Uses
+      At line 13 in file Blink.s
+Comment: __main used once
+7 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+GPIOA_MODER 40020000
+
+Symbol: GPIOA_MODER
+   Definitions
+      At line 8 in file Blink.s
+   Uses
+      At line 31 in file Blink.s
+Comment: GPIOA_MODER used once
+GPIOA_ODR 40020014
+
+Symbol: GPIOA_ODR
+   Definitions
+      At line 9 in file Blink.s
+   Uses
+      At line 39 in file Blink.s
+Comment: GPIOA_ODR used once
+RCC_AHB1ENR 40023830
+
+Symbol: RCC_AHB1ENR
+   Definitions
+      At line 7 in file Blink.s
+   Uses
+      At line 25 in file Blink.s
+Comment: RCC_AHB1ENR used once
+3 symbols
+347 symbols in table
